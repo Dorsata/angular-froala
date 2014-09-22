@@ -207,7 +207,7 @@ var customElements = angular.extend({}, makeMap("dorsata-article-reference"));
 
 
 // Special Elements (can contain anything)
-var specialElements = makeMap("script,style,dorsata-article-reference");
+var specialElements = makeMap("script,style");
 
 var validElements = angular.extend({},
                                    voidElements,
