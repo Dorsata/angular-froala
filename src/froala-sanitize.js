@@ -202,6 +202,9 @@ var inlineElements = angular.extend({}, optionalEndTagInlineElements, makeMap("a
         "bdi,bdo,big,br,cite,code,del,dfn,em,font,i,img,ins,kbd,label,map,mark,q,ruby,rp,rt,s," +
         "samp,small,span,strike,strong,sub,sup,time,tt,u,var"));
 
+// Custom Elements - HTML5
+var customElements = angular.extend({}, makeMap("dorsata-article-reference"));
+
 
 // Special Elements (can contain anything)
 var specialElements = makeMap("script,style,dorsata-article-reference");
@@ -210,6 +213,7 @@ var validElements = angular.extend({},
                                    voidElements,
                                    blockElements,
                                    inlineElements,
+                                   customElements,
                                    optionalEndTagElements);
 
 //Attributes that have href and hence need to be sanitized
