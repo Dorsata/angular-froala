@@ -204,7 +204,7 @@ var inlineElements = angular.extend({}, optionalEndTagInlineElements, makeMap("a
 
 
 // Special Elements (can contain anything)
-var specialElements = makeMap("script,style");
+var specialElements = makeMap("script,style,dorsata-article-reference");
 
 var validElements = angular.extend({},
                                    voidElements,
