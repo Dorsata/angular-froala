@@ -57,6 +57,12 @@ angular.module('froala', []).
 					var modiferKey = (e.ctrlKey || e.metaKey);
 
 					if(enterKey && modiferKey && !e.shiftKey && options.onCtrlEnter){
+						//debugger;
+						var deleteEvent = jQuery.Event("keydown");
+    				deleteEvent.ctrlKey = false;
+    				deleteEvent.which = 8;
+
+    				$(e.target).trigger(deleteEvent);
 						options.onCtrlEnter(e);
 					}
 				};
