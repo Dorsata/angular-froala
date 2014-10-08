@@ -8,14 +8,11 @@
 	myApp.controller('mainController', function($scope) {
 		$scope.options = {
 			placeholder : 'My Placeholder',
-			onKeyup : function(e){
+			onKeydown : function(e){
 				$scope.keyCode = e.keyCode;
-				if(
-				(e.which === 13 && e.ctrlKey && !e.shiftKey) ||
-				(e.which === 13 && e.metaKey && !e.shiftKey)
-				) {
-					alert('Ctrl + Enter Pressed!');
-				}
+			},
+			onCtrlEnter : function(){
+				alert('Save it!');
 			}
 		};
 

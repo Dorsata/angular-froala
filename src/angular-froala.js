@@ -49,6 +49,18 @@ angular.module('froala', []).
 					}
 				};
 
+				var keydownCallback = function(e){
+					if(options.onKeydown)
+								options.onKeydown(e);
+
+					var enterKey = e.which === 13;
+					var modiferKey = (e.ctrlKey || e.metaKey);
+
+					if(enterKey && modiferKey && !e.shiftKey && options.onCtrlEnter){
+						options.onCtrlEnter(e);
+					}
+				};
+
 				options.contentChangedCallback = function () {
 					if(contentChangedCallback)
 						contentChangedCallback();
@@ -62,11 +74,9 @@ angular.module('froala', []).
 				var froala = element.editable(options).data('fa.editable');
 
 				froala.$element.on('blur change keydown', function(e){
-					console.log(e.type);
 					switch(e.type){
 						case 'keydown' :
-							if(options.onKeyup)
-								options.onKeyup(e);
+							keydownCallback(e);
 							break;
 						default :
 
