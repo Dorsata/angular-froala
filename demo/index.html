@@ -38,6 +38,7 @@
 <!-- define angular controller -->
 <body ng-controller="mainController">
 	Most options can be changed after initialization, view <a href="http://editor.froala.com/options">http://editor.froala.com/options</a> for all options.
+	<br>KeyPressed: {{ keyCode }}
 	<div>Placeholder <input type="text" ng-model="options.placeholder">, <a href="" ng-click="froalaAction('focus')">Focus Editor</a></div>
 	<br>
 	<textarea froala="options" ng-model="myHtml"></textarea>

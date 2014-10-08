@@ -7,7 +7,10 @@
 	// create the controller and inject Angular's $scope
 	myApp.controller('mainController', function($scope) {
 		$scope.options = {
-			placeholder : 'My Placeholder'
+			placeholder : 'My Placeholder',
+			onKeyup : function(e){
+				$scope.keyCode = e.keyCode;
+			}
 		};
 
 		$scope.froalaAction = function(action){

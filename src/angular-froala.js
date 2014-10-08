@@ -62,6 +62,15 @@ angular.module('froala', []).
 				var froala = element.editable(options).data('fa.editable');
 
 				froala.$element.on('blur keyup change', function(e){
+					switch(e.type){
+						case 'keyup' :
+							if(options.onKeyup)
+								options.onKeyup(e);
+							break;
+						default :
+
+							break;
+					}
 					updateView();
 				});
 
