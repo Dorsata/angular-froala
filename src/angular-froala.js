@@ -57,7 +57,8 @@ angular.module('froala', []).
 					var modiferKey = (e.ctrlKey || e.metaKey);
 
 					if(enterKey && modiferKey && !e.shiftKey && options.onCtrlEnter){
-						//debugger;
+
+						//delete last character beacuse froala will catch the enter key and act upon it. (ex. inserting a new list item)
 						var deleteEvent = jQuery.Event("keydown");
     				deleteEvent.ctrlKey = false;
     				deleteEvent.which = 8;
