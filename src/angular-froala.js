@@ -140,7 +140,6 @@ angular.module('froala', []).
 			  			realEventName = eventName;
 			  		}
 
-			  		console.log('registering', realEventName, el);
 			  		el.on(realEventName, function(event, a, b, c, d, e){
 			  			//change to dynamically apply arguments, when we can support dynamically getting events
 			  			return callback(event, a, b, c, d, e);
