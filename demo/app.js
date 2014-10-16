@@ -11,8 +11,11 @@
 			onKeydown : function(e){
 				$scope.keyCode = e.keyCode;
 			},
-			onCtrlEnter : function(){
+			onCtrlEnter : function(e){
 				alert('Save it!');
+			},
+			onDelete : function(e){
+				console.log('deleted');
 			}
 		};
 
