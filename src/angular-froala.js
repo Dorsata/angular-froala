@@ -5,8 +5,6 @@ angular.module('froala', []).
 	directive('froala', ['froalaConfig', '$timeout', function(froalaConfig, $timeout) {
 		froalaConfig = froalaConfig || {};
 		var froalaEvents = ['afterPaste','afterRemoveImage','afterSave','afterUploadPastedImage','align','backColor','badLink','beforeDeleteImage','beforeFileUpload','beforeImageUpload','beforePaste','beforeRemoveImage','beforeSave','blur','bold','cellDeleted','cellHorizontalSplit','cellInsertedAfter','cellInsertedBefore','cellVerticalSplit','cellsMerged','columnDeleted','columnInsertedAfter','columnInsertedBefore','contentChanged','fileError','fileUploaded','focus','fontFamily','fontSize','foreColor','formatBlock','htmlHide','htmlShow','imageAltSet','imageDeleteError','imageDeleteSuccess','imageError','imageFloatedLeft','imageFloatedNone','imageFloatedRight','imageInserted','imageLinkInserted','imageLinkRemoved','imageLoaded','imageReplaced','imagesLoadError','imagesLoaded','indent','initialized','italic','linkInserted','linkRemoved','onPaste','orderedListInserted','outdent','redo','rowDeleted','rowInsertedAbove','rowInsertedBelow','saveError','selectAll','strikeThrough','subscript','superscript','tableDeleted','tableInserted','underline','undo','unorderedListInserted','videoError','videoFloatedLeft','videoFloatedNone','videoFloatedRight','videoInserted','videoRemoved'];
-		var nativeEvents = ['cut', 'copy'];
-		var froalaInstances = {};
 		var generatedIds = 0;
 		var slugToEventName = function(slug){
 			if(slug.search('froalaEvent') >= 0){
@@ -40,8 +38,7 @@ angular.module('froala', []).
 
 				var defaultOptions = {};
 				var contentChangedCallback;
-				var options = angular.extend(defaultOptions, froalaConfig, scope.froala);
-
+				var options = jQuery.extend( true, froalaConfig, scope.froala )
 				if(options.contentChangedCallback){
 					contentChangedCallback = options.contentChangedCallback;
 					delete options.contentChangedCallback;
@@ -71,13 +68,10 @@ angular.module('froala', []).
 				};
 
 				var keydownCallback = function(e){
-					if(options.onKeydown)
-								options.onKeydown(e);
 
 					var enterKey = e.which === 13;
 					var deleteKey = e.which === 8;
 					var modiferKey = (e.ctrlKey || e.metaKey);
-
 
 					if(enterKey && modiferKey && !e.shiftKey && options.onCtrlEnter){
 
@@ -119,17 +113,39 @@ angular.module('froala', []).
 					updateView();
 				});
 
+				var registerEventAndCallback = function(eventName, callback){
+			  	if(eventName && callback){
+			  		var el;
+			  		var realEventName;
+
+			  		if(froalaEvents.indexOf(eventName) > -1){
+			  			el = element;
+			  			realEventName = 'editable.' + eventName;
+			  		}else{
+			  			el = froala.$element;
+			  			realEventName = eventName;
+			  		}
+
+			  		console.log('registering', realEventName, el);
+			  		el.on(realEventName, function(event, a, b, c, d, e){
+			  			//change to dynamically apply arguments, when we can support dynamically getting events
+			  			return callback(event, a, b, c, d, e);
+			  		});
+			  	}
+				}
+
 				//register passed events
 				for (var key in attrs) {
 				  if (attrs.hasOwnProperty(key)) {
 				  	var eventName = slugToEventName(key);
-				  	if(eventName){
-				  		element.on('editable.' + eventName, function(event, a, b, c, d, e){
-				  			//change to dynamically apply arguments, when we can support dynamically getting events
-				  			return scope[event.namespace](event, a, b, c, d, e);
-				  		});
-				  	}
+				  	registerEventAndCallback(eventName, scope[eventName]);
 				  }
+				}
+
+				for(var key in options.events){
+					if (options.events.hasOwnProperty(key)) {
+						registerEventAndCallback(key, options.events[key]);
+					}
 				}
 
 				// the froala instance to the options object to make methods available in parent scope
