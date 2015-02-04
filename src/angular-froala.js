@@ -23,6 +23,7 @@ angular.module('froala', []).
 		var scope = {
 			froala : '='
 		};
+
 		for (var i = 0; i < froalaEvents.length; i++) {
 		   scope[froalaEvents[i]] = '=' + eventNameToSlug(froalaEvents[i]);
 		}
@@ -97,7 +98,7 @@ angular.module('froala', []).
 				};
 
 				ngModel.$render = function(){
-					element.editable('setHTML', ngModel.$viewValue || '', false);
+					element.editable('setHTML', ngModel.$viewValue || '', true);
 				};
 
 				var froala = element.editable(options).data('fa.editable');
@@ -132,18 +133,17 @@ angular.module('froala', []).
 			  			realEventName = eventName;
 			  		}
 
-			  		el.on(realEventName, function(event, a, b, c, d, e){
-			  			//change to dynamically apply arguments, when we can support dynamically getting events
-			  			return callback(event, a, b, c, d, e);
-			  		});
+			  		el.on(realEventName, callback);
 			  	}
-				}
+				};
 
 				//register passed events
 				for (var key in attrs) {
 				  if (attrs.hasOwnProperty(key)) {
-				  	var eventName = slugToEventName(key);
-				  	registerEventAndCallback(eventName, scope[eventName]);
+				  	var eventName = slugToEventName(key); //returns false if not an event
+				  	if(eventName){
+				  		registerEventAndCallback(eventName, scope[eventName]);
+				  	}
 				  }
 				}
 
@@ -169,7 +169,7 @@ angular.module('froala', []).
 				}, true);
 
 				scope.$on('$destroy', function(){
-					element.editable('destroy');
+					froala['destroy']();
 				});
 			}
 		};
