@@ -38,7 +38,8 @@ angular.module('froala', []).
 
 				var defaultOptions = {};
 				var contentChangedCallback;
-				var options = jQuery.extend( true, froalaConfig, scope.froala )
+
+				var options = angular.extend({}, froalaConfig, scope.froala);
 				if(options.contentChangedCallback){
 					contentChangedCallback = options.contentChangedCallback;
 					delete options.contentChangedCallback;
@@ -113,19 +114,10 @@ angular.module('froala', []).
 					updateView();
 				});
 
-				if(options.clickOnChild){
-					var lastMouseUp = 0, lastMouseDown = 0;
-					//it's really click but not hold on child element.
-					froala.$element.on('click mousedown', options.clickOnChild.child, function(e){
-						e.preventDefault();
-				    var ms = new Date().getTime();
-				    e.type == 'mousedown' ? lastMouseDown = ms : lastMouseUp = ms;
+				angular.forEach(options.onChild, function(value, key){
+					froala.$element.on(value.event, value.child, value.callback);
+				});
 
-				    if(e.type != 'mousedown' && (Math.abs(lastMouseUp - lastMouseDown)  < 300)){
-				      options.clickOnChild.callback(e);
-				    }
-					});
-				}
 
 				var registerEventAndCallback = function(eventName, callback){
 			  	if(eventName && callback){
