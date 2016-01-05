@@ -203,7 +203,7 @@ var inlineElements = angular.extend({}, optionalEndTagInlineElements, makeMap("a
         "samp,small,span,strike,strong,sub,sup,time,tt,u,var"));
 
 // Custom Elements - HTML5
-var customElements = angular.extend({}, makeMap("dorsata-article-reference"));
+var customElements = angular.extend({}, makeMap("dorsata-article-reference, dorsata-pathway-reference"));
 
 
 // Special Elements (can contain anything)
