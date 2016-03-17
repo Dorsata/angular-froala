@@ -1,14 +1,16 @@
 angular.module('froala', []).
-value('froalaConfig', {}).
-directive('froala', ['froalaConfig', function (froalaConfig) {
+value('froalaConfig', {})
+.directive('froala', ['froalaConfig', function (froalaConfig) {
     "use strict"; //Scope strict mode to only this directive
-    froalaConfig = froalaConfig || {};
     var generatedIds = 0;
+    var defaultConfig = { immediateAngularModelUpdate: false};
 
     var scope = {
         froalaOptions: '=froala',
         initFunction: '&froalaInit'
     };
+
+    froalaConfig = froalaConfig || {};
 
     // Constants
     var MANUAL = "manual";
@@ -27,7 +29,6 @@ directive('froala', ['froalaConfig', function (froalaConfig) {
             scope.initMode = attrs.froalaInit ? MANUAL : AUTOMATIC;
 
             ctrl.init = function () {
-                ctrl.listeningEvents = ["keyup", 'froalaEditor'];
                 if (!attrs.id) {
                     // generate an ID if not present
                     attrs.$set('id', 'froala-' + generatedIds++);
@@ -43,6 +44,7 @@ directive('froala', ['froalaConfig', function (froalaConfig) {
                     element.froalaEditor('html.set', ngModel.$viewValue || '', true);
                     //This will reset the undo stack everytime the model changes externally. Can we fix this?
                     element.froalaEditor('undo.reset');
+                    element.froalaEditor('undo.saveStep');
                 };
 
                 ngModel.$isEmpty = function (value) {
@@ -52,17 +54,24 @@ directive('froala', ['froalaConfig', function (froalaConfig) {
             };
 
             ctrl.createEditor = function () {
+                ctrl.listeningEvents = ['froalaEditor'];
                 if (!ctrl.editorInitialized) {
-                    ctrl.options = angular.extend({}, froalaConfig, scope.froalaOptions);
-                    ctrl.froalaElement = element.froalaEditor(ctrl.options).data('froala.editor').$el;
-                    ctrl.froalaEditor = angular.bind(element, element.froalaEditor);
+                    ctrl.options = angular.extend({}, defaultConfig, froalaConfig, scope.froalaOptions);
 
-                    //Register events provided in the options
+                    if (ctrl.options.immediateAngularModelUpdate) {
+                        ctrl.listeningEvents.push('keyup');
+                    }
+
+                    // Register events provided in the options
+                    // Registering events before initializing the editor will bind the initialized event correctly.
                     for (var eventName in ctrl.options.events) {
                         if (ctrl.options.events.hasOwnProperty(eventName)) {
                             ctrl.registerEventsWithCallbacks(eventName, ctrl.options.events[eventName]);
                         }
                     }
+
+                    ctrl.froalaElement = element.froalaEditor(ctrl.options).data('froala.editor').$el;
+                    ctrl.froalaEditor = angular.bind(element, element.froalaEditor);
                     ctrl.initListeners();
 
                     //assign the froala instance to the options object to make methods available in parent scope
@@ -75,12 +84,14 @@ directive('froala', ['froalaConfig', function (froalaConfig) {
             };
 
             ctrl.initListeners = function () {
-                ctrl.froalaElement.on('keyup', function () {
-                    ctrl.updateModelView();
-                });
+                if (ctrl.options.immediateAngularModelUpdate) {
+                    ctrl.froalaElement.on('keyup', function () {
+                        scope.$evalAsync(ctrl.updateModelView);
+                    });
+                }
 
                 element.on('froalaEditor.contentChanged', function () {
-                    ctrl.updateModelView();
+                    scope.$evalAsync(ctrl.updateModelView);
                 });
 
                 scope.$on('$destroy', function () {
@@ -122,4 +133,21 @@ directive('froala', ['froalaConfig', function (froalaConfig) {
             ctrl.init();
         }
     };
+}])
+.directive('froalaView', ['$sce', function ($sce) {
+	return {
+		restrict: 'ACM',
+		scope: {
+			content: '=froalaView'
+		},
+		link: function (scope, element) {
+			element.addClass('fr-view');
+			scope.$watch('content', function (nv) {
+				if (nv || nv === ''){
+					var explicitlyTrustedValue = $sce.trustAsHtml(nv);
+					element.html(explicitlyTrustedValue.toString());
+				}
+			});
+		}
+	};
 }]);

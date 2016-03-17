@@ -3,7 +3,9 @@ describe("froala", function () {
     var $compile;
     var $rootScope;
     var element = null;
+    var view = null;
     var elementHtml = null;
+    var viewHtml = null;
     var froalaEditorStub = null;
     var froalaEditorOnStub = null;
     var froalaEditorOffStub = null;
@@ -19,6 +21,7 @@ describe("froala", function () {
 
         froalaConfig.placeholderText = 'Placeholder';
         elementHtml = "<div froala='froalaOptions' ng-model='content'></div>";
+        viewHtml = "<div froala-view='content'></div>";
     }));
 
     var compileElement = function (extraSetup) {
@@ -29,6 +32,10 @@ describe("froala", function () {
         }
 
         element = $compile(elementHtml)($rootScope);
+    };
+
+    var compileViewElement = function () {
+    	view = $compile(viewHtml)($rootScope);
     };
 
     var setupFroalaEditorStub = function () {
@@ -46,9 +53,10 @@ describe("froala", function () {
     };
 
     var populateScope = function (scope) {
-        scope.froalaOptions = {
-            initOnClick: true
-        };
+        if (scope.froalaOptions === undefined) {
+            scope.froalaOptions = {};
+        }
+        scope.froalaOptions.initOnClick = true;
         scope.content = '';
     };
 
@@ -83,6 +91,19 @@ describe("froala", function () {
         expect(froalaEditorStub.args[0][0].initOnClick).toBeTruthy();
     });
 
+    it('Uses default option values when no options are provided', function () {
+        compileElement();
+
+        expect(froalaEditorStub.args[0][0].immediateAngularModelUpdate).toBeFalsy();
+    });
+
+    it('Can overwrite default options', function () {
+        $rootScope.froalaOptions = {immediateAngularModelUpdate: true};
+        compileElement();
+
+        expect(froalaEditorStub.args[0][0].immediateAngularModelUpdate).toBeTruthy();
+    });
+
     it('Returns the instantiated editor in the options', function () {
         compileElement();
 
@@ -100,9 +121,17 @@ describe("froala", function () {
     });
 
     it('Registers the Key Up event', function () {
+        $rootScope.froalaOptions = {immediateAngularModelUpdate: true};
         compileElement();
 
         expect(froalaEditorOnStub.args[0][0]).toEqual('keyup');
+    });
+
+    it('Does not register the Key Up event if immediateAngularModelUpdate is false', function () {
+        $rootScope.froalaOptions = {immediateAngularModelUpdate: false};
+        compileElement();
+
+        expect(froalaEditorOnStub.args.length).toEqual(0);
     });
 
     it('Destroys editor when directive is destroyed', function () {
@@ -114,7 +143,8 @@ describe("froala", function () {
     });
 
 
-    it('Updates the model after a key is released', function () {
+    it('Updates the model after a key is released when option for immediate update is activated', function () {
+        $rootScope.froalaOptions = {immediateAngularModelUpdate: true};
         compileElement(function () {
             froalaEditorStub.onSecondCall().returns('My String');
         });
@@ -266,4 +296,13 @@ describe("froala", function () {
         //
 
     });
+
+		it('Sets the view to the value of the model', function () {
+				$rootScope.content = '<i>New Text</i>';
+
+				compileViewElement();
+				$rootScope.$digest();
+
+      	expect(view.html()).toEqual("<i>New Text</i>");
+		});
 });

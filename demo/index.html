@@ -4,6 +4,8 @@
 <html ng-app="myApp">
 
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0"/>
   <script src="../bower_components/jquery/dist/jquery.min.js"></script>
 
   <!-- Include Font Awesome. -->
@@ -57,7 +59,6 @@
 
   <script src="../bower_components/angular/angular.min.js"></script>
 
-  <script src="../src/froala-sanitize.js"></script>
   <script src="../src/angular-froala.js"></script>
   <script src="app.js"></script>
   <style>
@@ -80,7 +81,7 @@
       <h2>Sample 2: Full Editor</h2>
       <textarea id="froala-sample-2" froala ng-model="sample2Text"></textarea>
       <h4>Rendered Content:</h4>
-      <div class="fr-view" ng-bind-html="sample2Text"></div>
+      <div froala-view="sample2Text"></div>
     </div>
 
     <div class="sample">

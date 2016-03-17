@@ -1,26 +1,9 @@
 	// add the module with global defaults for froala
-	var myApp = angular.module('myApp', ['ngSanitize', 'froala']).
-		value('froalaConfig', {
-			// inlineMode: false,
-			// allowedTags: ["p", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "pre", "blockquote", "table", "thead", "tbody", "tfoot", "tr", "th", "td", "span", "b", "u", "i", "strong", "em", "strike", "img", "ul", "ol", "li", "iframe", "object", "a", "main", "section", "article", "nav", "header", "aside", "figure", "figurecaption", "footer", "details", "summary", "mark", "time", "sub", "sup", "dorsata"],
-			// allowedAttrs: ["class", "id", "title", "href", "alt", "src", "style", "width", "height", "target", "rel", "name", "value", "type", "colspan", "rowspan", "size", "color", "cellpadding", "cellspacing", "valign", "align", "autocomplete", "background", "bgcolor", "contenteditable", "tabindex", "data-.*", "contenteditable", "tabindex", "item-id"],
-			// events : {
-			// 	align : function(e, editor, alignment){
-			// 		console.log(alignment + ' aligned');
-			// 	}
-			// },
-			// onChild : [
-			// {
-			// 	event : 'keydown keyup',
-			// 	child : 'dorsata-article-reference',
-			// 	callback : function(e){
-			// 		console.log(e.type, 'from onChild');
-			// 	}
-			// }]
-
-			toolbarInline: false,
-			placeholderText: "Edit Your Content Here!"
-		});
+	var myApp = angular.module('myApp', ['froala']).
+	value('froalaConfig', {
+		toolbarInline: false,
+		placeholderText: 'Edit Your Content Here!'
+	});
 
 	// create the controller and inject Angular's $scope
 	myApp.controller('mainController', function($scope) {
@@ -48,18 +31,25 @@
 		// }
 
 		$scope.titleOptions = {
-			placeholderText : 'Add a Title',
+			placeholderText: 'Add a Title',
 			charCounterCount: false,
-			toolbarInline: true
+			toolbarInline: true,
+			events: {
+				'froalaEditor.initialized': function() {
+					console.log('initialized');
+				}
+			}
 		};
 
-    $scope.initialize = function (initControls) {
-      $scope.initControls = initControls;
-      $scope.deleteAll = function() {initControls.getEditor()('html.set', '');};
-    };
+		$scope.initialize = function(initControls) {
+			$scope.initControls = initControls;
+			$scope.deleteAll = function() {
+				initControls.getEditor()('html.set', '');
+			};
+		};
 
 		$scope.myTitle = '<span style="font-family: Verdana,Geneva,sans-serif; font-size: 30px;">My Document\'s Title</span><span style="font-size: 18px;"></span></span>';
-		$scope.sample2Text = "";
-    $scope.sample3Text = "";
+		$scope.sample2Text = '';
+		$scope.sample3Text = '';
 
 	});

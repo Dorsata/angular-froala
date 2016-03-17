@@ -13,7 +13,6 @@ This repository contains bindings for the latest version of the Froala Editor (v
 
 3. Load Froala WYSIWYG editor (and all desired plugins), jQuery and the angular-froala files into your project
 	- src/angular-froala.js
-	- src/froala-sanitize.js
 
 ## Usage
 
@@ -48,10 +47,17 @@ function myCtrl($scope){
 _view.html_
 
 ```html
-<textarea froala="froalaOptions" ngModel="myHtml"></textarea>
+<textarea froala="froalaOptions" ng-model="myHtml"></textarea>
 ```
-View a list of all the options available in the [docs](https://www.froala.com/wysiwyg-editor/docs/options)
 
+You can pass any existing Froala option. Consult the [Froala documentation](https://www.froala.com/wysiwyg-editor/docs/options) to view the list of all the available options.
+
+####Directive Specific Option
+The *angular-froala* directive exposes the following additional option:
+
+ * **immediateAngularModelUpdate**: (default: false) This option synchronizes the angular model as soon as a key is released in the editor. Note that it may affect
+  performances.
+  
 ###Methods
 
 To use the methods available, access the editor instance from your froalaOptions object `$scope.options.froalaEditor(method)` and use it as described in the [method docs](http://froala.com/wysiwyg-editor/docs/methods). example:
@@ -60,11 +66,14 @@ To use the methods available, access the editor instance from your froalaOptions
 function myCtrl($scope){
 	$scope.myHtml = "";
 	$scope.froalaOptions = {
-		toolbarButtons : ["bold", "italic", "underline", "|", "align", "formatOL", "formatUL"]
+		toolbarButtons : ["bold", "italic", "underline", "|", "align", "formatOL", "formatUL"],
+		events: {
+			'froalaEditor.initialized': function () {
+				// Use the methods like this.
+				$scope.froalaOptions.froalaEditor('selection.get');
+			}
+		}
 	}
-
-//Use the methods like this
-$scope.froalaOptions.froalaEditor("selection.get");
 ```
 ###Events
  Events can be passed in with the options, with a key events and object where the key is the event name and the value is the callback function.
@@ -95,9 +104,17 @@ The object received by the function will contain the following methods:
 
 Checkout the demo file to see a working example.
 
-###Displaying Html
+<!-- ### Displaying Html -->
 
-Using `ng-bind-html` will render your html on the page but the default angular-sanitize.js will strip out all style tags. Remedy this by including `froala-sanitize.js` instead. example: `<div class="fr-view" ng-bind-html="myHtml"></div>`
+![screenshot 2016-02-25 16 47 15](https://cloud.githubusercontent.com/assets/597735/13335505/774c0a76-dbdf-11e5-94c5-b0eb9c5b4923.png)
+
+To display content created with the froala editor use the froala-view directive.
+if `myHtml` is your model, then the following will render your content.
+```html
+<div froala-view="myHtml"></div>
+```
+
+If you are using the old `ng-bind-html` that will continue to work however it still requires froala-sanitize.js to be used and not all of froala is supported with it. The updated directive does __not__ require froala-sanitize.
 
 Congrats all is done!
 
@@ -135,7 +152,7 @@ Clone the Git [Angular-Froala](https://github.com/froala/angular-froala) reposit
     $ bower install
 
 #### Running tests
-Each contribution to the project should come with its set of unit tests thus ensuring that the new behaviour will not be altered by subsequent commits. 
+Each contribution to the project should come with its set of unit tests thus ensuring that the new behaviour will not be altered by subsequent commits.
 So, before each commit to the repository, run the tests by running the following grunt task:
 
     $ grunt test
